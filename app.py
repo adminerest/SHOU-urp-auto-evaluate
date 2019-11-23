@@ -46,7 +46,6 @@ class App:
         code = self.code.get()
         if self.eva.login(user, password, code):  # 传入文本框中三个参数
             self.eva.evaluate()
-            # 如果登录失败验证码会更换，返回-1时刷新验证码
         self.change()
         self.button1.configure(state='normal')
         self.button2.configure(state='normal')

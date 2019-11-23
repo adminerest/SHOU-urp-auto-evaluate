@@ -35,16 +35,19 @@ class Lesson:
                 "evaluationContentContent": ""}
         url = "https://urp.shou.edu.cn/student/teachingEvaluation/teachingEvaluation/evaluationPage"
         try:
-            html = self.session.post(url=url, data=data)
+            html = self.session.post(url=url, data=data, timeout=5)
         except requests.ConnectionError:
             self.error.set("获取评教页面失败！连接错误！")
-            exit(0)
+            raise
         except requests.HTTPError:
             self.error.set("获取评教页面失败！请求网页有问题！")
-            exit(0)
+            raise
         except requests.Timeout:
             self.error.set("获取评教页面失败！请求超时！")
-            exit(0)
+            raise
+        if html.url == "https://urp.shou.edu.cn/login?errorCode=concurrentSessionExpired":
+            self.error.set("请勿在程序运行时登录！")
+            raise
         data = {"questionnaireCode": self.questionnaireCode,
                 "evaluationContentNumber": self.evaluationContentNumber,
                 "evaluatedPeopleNumber": self.evaluatedPeopleNumber,
@@ -60,17 +63,20 @@ class Lesson:
         url = "https://urp.shou.edu.cn/student/teachingEvaluation/teachingEvaluation/evaluation"
         sleep(30)  # 后端强制限时30秒后才能提交。。。这个坑了我一整天。。。2019-11-22-22:00:00
         try:
-            rq = self.session.post(url=url, data=data)  # 提交评价
+            rq = self.session.post(url=url, data=data, timeout=5)  # 提交评价
         except requests.ConnectionError:
             self.error.set("提交评价失败！连接错误！")
-            exit(0)
+            raise
         except requests.HTTPError:
             self.error.set("提交评价失败！请求网页有问题！")
-            exit(0)
+            raise
         except requests.Timeout:
             self.error.set("提交评价失败！请求超时！")
-            exit(0)
-        if "success" in rq.text:  # 判断后端返回参数
+            raise
+        if rq.url == "https://urp.shou.edu.cn/login?errorCode=concurrentSessionExpired":
+            self.error.set("请勿在程序运行时登录！")
+            raise
+        elif "success" in rq.text:  # 判断后端返回参数
             return True
         else:
             return False
