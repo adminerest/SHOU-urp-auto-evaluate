@@ -3,6 +3,7 @@
 ## 依赖的库
 * bs4
 * requests
+* pillow
 ## 原理
 * 模拟登陆获取cookie
 * 获取评价列表
