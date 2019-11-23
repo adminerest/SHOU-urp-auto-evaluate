@@ -3,7 +3,7 @@ import requests
 from PIL import Image, ImageTk
 from lesson import Lesson
 
-# @Author:admineres
+# @Author:adminerest
 
 
 class Evaluation:
