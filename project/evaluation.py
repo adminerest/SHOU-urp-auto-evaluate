@@ -27,7 +27,7 @@ class Evaluation:
             return
         self.error.set("登录成功！\n正在评教...请稍等")
         for lesson in unfinished_lessons:
-            if lesson.single_lession_evaluate():  # 每门课程进行评教，返回是否评教成功
+            if lesson.single_lesson_evaluate():  # 每门课程进行评教，返回是否评教成功
                 count += 1
         if count == len(unfinished_lessons):  # 判断多少课程评教成功
             self.error.set("全部课程评教成功！")
