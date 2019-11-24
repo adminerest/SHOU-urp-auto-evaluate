@@ -100,7 +100,7 @@ class Evaluation:
         else:
             image_bytes = login_img.content
             data_stream = io.BytesIO(image_bytes)
-            pil_image = Image.open(data_stream)
+            pil_image: Image = Image.open(data_stream)
             return True, pil_image, "获取验证码成功"
 
     def login(self, user, password, code) -> bool:
