@@ -1,6 +1,7 @@
 .idea/
 __pycache__/
 .DS_Store
-Setup.py
 Icon.icns
 releases/
+*.iml
+/venv

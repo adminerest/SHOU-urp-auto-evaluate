@@ -1,5 +1,5 @@
 import tkinter as tk
-from app import App
+from project.app import App
 
 # @author: huobaolajiao, adminerest
 
