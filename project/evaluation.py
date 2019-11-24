@@ -1,6 +1,9 @@
 import io
+from typing import Tuple
+
 import requests
 from PIL import Image, ImageTk
+
 from lesson import Lesson
 
 
@@ -69,52 +72,75 @@ class Evaluation:
                 lessons.append(lesson_data)
         return lessons
 
-    '''
-    获取验证码图片
-    '''
-
     def get_login_img(self):
+        """
+        获取验证码图片
+        :return:
+        """
+        flag, pil_image, message = self.get_verification_code_image()
+        if not flag:
+            self.error.set(message)
+            return None
+        tk_image = ImageTk.PhotoImage(pil_image)
+        return tk_image
+
+    def get_verification_code_image(self):
+        """
+        获取验证码图片请求
+        :return: image, error message
+        """
         try:
             login_img = self.session.get("https://urp.shou.edu.cn/img/captcha.jpg", timeout=5)
         except requests.ConnectionError:
-            self.error.set("获取验证码失败！连接错误！")
-            return None
+            return False, None, "获取验证码失败！连接错误！"
         except requests.HTTPError:
-            self.error.set("获取验证码失败！请求网页有问题！")
-            return None
+            return False, None, "获取验证码失败！请求网页有问题！"
         except requests.Timeout:
-            self.error.set("获取验证码失败！请求超时！")
-            return None
+            return False, None, "获取验证码失败！请求超时！"
         else:
             image_bytes = login_img.content
             data_stream = io.BytesIO(image_bytes)
             pil_image = Image.open(data_stream)
-            tk_image = ImageTk.PhotoImage(pil_image)
-            return tk_image
+            return True, pil_image, "获取验证码成功"
 
-    '''
-    进行登录
-    '''
+    def login(self, user, password, code) -> bool:
+        """
+        登录
+        :param user: username
+        :param password: password
+        :param code: verify code
+        :return: login result :`True` or `False`
+        """
+        flag, message = self.login_request(username=user, password=password, code=code)
+        if not flag:
+            self.error.set(message)
+        return flag
 
-    def login(self, user, password, code):
-        data = {"j_username": user, "j_password": password, "j_captcha": code,
-                "_spring_security_remember_me": "on"}
+    def login_request(self, username, password, code) -> Tuple[bool, str]:
+        """
+        登录请求
+        :param username: username
+        :param password: password
+        :param code: verificationCode
+        :return: login result and error message
+        """
+        data = {
+            "j_username": username,
+            "j_password": password,
+            "j_captcha": code,
+            "_spring_security_remember_me": "on"
+        }
         try:
             rp = self.session.post(url="https://urp.shou.edu.cn/j_spring_security_check", data=data, timeout=5)
         except requests.ConnectionError:
-            self.error.set("登录失败！连接错误！")
-            return False
+            return False, "登录失败！连接错误！"
         except requests.HTTPError:
-            self.error.set("登录失败！请求网页有问题！")
-            return False
+            return False, "登录失败！请求网页有问题！"
         except requests.Timeout:
-            self.error.set("登录失败！请求超时！")
-            return False
+            return False, "登录失败！请求超时！"
         else:
             if rp.url == "https://urp.shou.edu.cn/login?errorCode=badCaptcha":
-                self.error.set("验证码输入错误！")
-                return False
+                return False, "验证码输入错误！"
             elif rp.url == "https://urp.shou.edu.cn/login?errorCode=badCredentials":
-                self.error.set("用户名或密码输入错误！")
-                return False
-        return True
+                return False, "用户名或密码输入错误！"
+        return True, "登录成功"
