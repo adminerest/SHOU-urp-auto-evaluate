@@ -3,7 +3,7 @@ import unittest
 from evaluation import Evaluation
 
 
-class MyTestCase(unittest.TestCase):
+class TestRequests(unittest.TestCase):
     session = Evaluation(error=None)
 
     def test_login(self):

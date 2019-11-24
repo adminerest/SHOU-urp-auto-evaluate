@@ -7,56 +7,51 @@ from PIL import Image, ImageTk
 from lesson import Lesson
 
 
-# @Author:adminerest
-
-
 class Evaluation:
+    """
+    author: adminerest
+    """
+
     def __init__(self, error):
         self.session = requests.session()  # 初始化个session
         self.error = error  # 传入信息显示模块
 
-    '''
-    进行评教
-    '''
-
     def evaluate(self):
-        try:
-            lessons = self.get_unfinished_lessons()  # 获取未评教课程列表
-            count = 0
-            self.error.set("登录成功！\n正在评教...请稍等")
-            for les in lessons:
-                if les.evaluate():  # 每门课程进行评教，返回是否评教成功
-                    count += 1
-            if count == len(lessons):  # 判断多少课程评教成功
-                self.error.set("全部课程评教成功！")
-            elif count == 0:
-                self.error.set("没有课程评教成功！")
-            else:
-                self.error.set("部分课程评教成功！")
-        except:
-            return False
-
-    '''
-    获取需要评教的课程基本信息
-    '''
+        """
+        进行评教
+        """
+        flag, message, unfinished_lessons = self.get_unfinished_lessons()  # 获取未评教课程列表
+        count = 0
+        if not flag:
+            self.error.set(message)
+            return
+        self.error.set("登录成功！\n正在评教...请稍等")
+        for lesson in unfinished_lessons:
+            if lesson.single_lession_evaluate():  # 每门课程进行评教，返回是否评教成功
+                count += 1
+        if count == len(unfinished_lessons):  # 判断多少课程评教成功
+            self.error.set("全部课程评教成功！")
+        elif count == 0:
+            self.error.set("没有课程评教成功！")
+        else:
+            self.error.set("部分课程评教成功！")
 
     def get_unfinished_lessons(self):
+        """
+        获取需要评教的课程基本信息
+        """
         lessons = []
         list_url = "https://urp.shou.edu.cn/student/teachingEvaluation/teachingEvaluation/search"
         try:
             html = self.session.post(url=list_url, timeout=5)  # 获取评教列表
         except requests.ConnectionError:
-            self.error.set("获取待评教列表失败！连接错误！")
-            raise
+            return False, "获取待评教列表失败！连接错误！", []
         except requests.HTTPError:
-            self.error.set("获取待评教列表失败！请求网页有问题！")
-            raise
+            return False, "获取待评教列表失败！请求网页有问题！", []
         except requests.Timeout:
-            self.error.set("获取待评教列表失败！请求超时！")
-            raise
+            return False, "获取待评教列表失败！请求超时！"
         if html.url == "https://urp.shou.edu.cn/login?errorCode=concurrentSessionExpired":
-            self.error.set("请勿在程序运行时登录！")
-            raise
+            return False, "请勿在程序运行时登录！", []
         info = html.content
         lessons_list = eval(info)["data"]
         for lesson_info in lessons_list:
@@ -70,7 +65,7 @@ class Evaluation:
                                      lesson_info["evaluationContent"],
                                      self.error)
                 lessons.append(lesson_data)
-        return lessons
+        return True, '获取待评教列表成功', lessons
 
     def get_login_img(self):
         """

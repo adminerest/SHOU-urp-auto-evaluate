@@ -1,41 +1,47 @@
-import requests
-from bs4 import BeautifulSoup
 from re import compile
 from time import sleep
 
-# @Author:adminerest
+import requests
+from bs4 import BeautifulSoup
 
 
 class Lesson:
+    """
+    author: adminerest
+    """
 
     def __init__(self,
                  session,
-                 evaluatedPeople,
-                 evaluatedPeopleNumber,
-                 questionnaireCode,
-                 questionnaireName,
-                 evaluationContentNumber,
-                 evaluationContent,
+                 evaluated_people,
+                 evaluated_people_number,
+                 questionnaire_code,
+                 questionnaire_name,
+                 evaluation_content_number,
+                 evaluation_content,
                  error):
         self.session = session
-        self.evaluatedPeopleNumber = evaluatedPeopleNumber
-        self.questionnaireCode = questionnaireCode
-        self.evaluationContentNumber = evaluationContentNumber
-        self.questionnaireName = questionnaireName
-        self.evaluatedPeople = evaluatedPeople
-        self.evaluationContent = evaluationContent
+        self.evaluated_people_number = evaluated_people_number
+        self.questionnaire_code = questionnaire_code
+        self.evaluation_content_number = evaluation_content_number
+        self.questionnaire_name = questionnaire_name
+        self.evaluated_people = evaluated_people
+        self.evaluation_content = evaluation_content
         self.error = error
 
-    '''单门课程进行评教'''
-
-    def evaluate(self):
-        data = {"evaluatedPeopleNumber": self.evaluatedPeopleNumber,
-                "questionnaireCode": self.questionnaireCode,
-                "evaluationContentNumber": self.evaluationContentNumber,
-                "questionnaireName": self.questionnaireName,
-                "evaluatedPeople": self.evaluatedPeople,
-                "evaluationContentContent": ""}
-        self.error.set("正在评价" + self.evaluationContent)
+    def single_lession_evaluate(self):
+        """
+        单门课程进行评教
+        :return:
+        """
+        data = {
+            "evaluatedPeopleNumber": self.evaluated_people_number,
+            "questionnaireCode": self.questionnaire_code,
+            "evaluationContentNumber": self.evaluation_content_number,
+            "questionnaireName": self.questionnaire_name,
+            "evaluatedPeople": self.evaluated_people,
+            "evaluationContentContent": ""
+        }
+        self.error.set("正在评价" + self.evaluation_content)
         url = "https://urp.shou.edu.cn/student/teachingEvaluation/teachingEvaluation/evaluationPage"
         try:
             html = self.session.post(url=url, data=data, timeout=5)
@@ -51,9 +57,9 @@ class Lesson:
         if html.url == "https://urp.shou.edu.cn/login?errorCode=concurrentSessionExpired":
             self.error.set("请勿在程序运行时登录！")
             raise
-        data = {"questionnaireCode": self.questionnaireCode,
-                "evaluationContentNumber": self.evaluationContentNumber,
-                "evaluatedPeopleNumber": self.evaluatedPeopleNumber,
+        data = {"questionnaireCode": self.questionnaire_code,
+                "evaluationContentNumber": self.evaluation_content_number,
+                "evaluatedPeopleNumber": self.evaluated_people_number,
                 "zgpj": "老师非常好",
                 "count": ""}
         bs = BeautifulSoup(html.text, "html.parser")
