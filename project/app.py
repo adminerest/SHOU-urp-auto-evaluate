@@ -1,11 +1,15 @@
 import threading
-from evaluation import Evaluation
+# noinspection PyCompatibility
 import tkinter as tk
 
-# @author: huobaolajiao
+from evaluation import Evaluation
 
 
 class App:
+    """
+    author: huobaolajiao
+    """
+
     def __init__(self, root):
         self.labelusr = tk.Label(root, text='学号：')
         self.labelusr.grid(row=0, sticky=tk.W)
