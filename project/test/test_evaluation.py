@@ -7,10 +7,12 @@ class MyTestCase(unittest.TestCase):
     session = Evaluation(error=None)
 
     def test_login(self):
-        print(self.session.login_request(username='1651312', password='cjh1998CJH', code='1234'))
+        flag, message = self.session.login_request(username='1651312', password='cjh1998CJH', code='1234')
+        self.assertFalse(flag)
 
     def test_get_verification_code_image(self):
-        print(self.session.get_verification_code_image())
+        flag, image, message = self.session.get_verification_code_image()
+        self.assertTrue(flag)
 
 
 if __name__ == '__main__':
