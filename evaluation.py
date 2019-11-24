@@ -64,6 +64,7 @@ class Evaluation:
                                      lesson_info["id"]["questionnaireCoding"],
                                      lesson_info["questionnaire"]["questionnaireName"],
                                      lesson_info["id"]["evaluationContentNumber"],
+                                     lesson_info["evaluationContent"],
                                      self.error)
                 lessons.append(lesson_data)
         return lessons

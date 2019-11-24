@@ -15,6 +15,7 @@ class Lesson:
                  questionnaireCode,
                  questionnaireName,
                  evaluationContentNumber,
+                 evaluationContent,
                  error):
         self.session = session
         self.evaluatedPeopleNumber = evaluatedPeopleNumber
@@ -22,6 +23,7 @@ class Lesson:
         self.evaluationContentNumber = evaluationContentNumber
         self.questionnaireName = questionnaireName
         self.evaluatedPeople = evaluatedPeople
+        self.evaluationContent = evaluationContent
         self.error = error
 
     '''单门课程进行评教'''
@@ -33,6 +35,7 @@ class Lesson:
                 "questionnaireName": self.questionnaireName,
                 "evaluatedPeople": self.evaluatedPeople,
                 "evaluationContentContent": ""}
+        self.error.set("正在评价" + self.evaluationContent)
         url = "https://urp.shou.edu.cn/student/teachingEvaluation/teachingEvaluation/evaluationPage"
         try:
             html = self.session.post(url=url, data=data, timeout=5)
